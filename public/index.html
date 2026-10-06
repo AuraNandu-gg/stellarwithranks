@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stellar Party</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌟</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Orbitron:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div id="stars-bg"></div>
+  <div id="app">
+    <!-- LOGIN -->
+    <section id="view-login" class="view active">
+      <div class="hero-card">
+        <div class="logo-mark">✦</div>
+        <h1>Stellar Party</h1>
+        <p class="tagline">Collect stars with friends. Race the clock. Glow together.</p>
+        <div class="auth-tabs">
+          <button type="button" id="tab-login" class="auth-tab active">Log in</button>
+          <button type="button" id="tab-register" class="auth-tab">Create account</button>
+        </div>
+        <form id="login-form">
+          <label for="username">Username</label>
+          <input id="username" maxlength="16" autocomplete="username" placeholder="StarCaptain" required />
+          <p id="name-status" class="name-status"></p>
+          <label for="password">Password</label>
+          <input id="password" type="password" minlength="4" maxlength="64" autocomplete="current-password" placeholder="At least 4 characters" required />
+          <button type="submit" id="auth-submit" class="btn primary">Log in</button>
+        </form>
+        <div class="taken-box">
+          <div class="taken-head">
+            <span>Usernames taken <strong id="taken-count">0</strong></span>
+            <button type="button" id="btn-refresh-names" class="btn tiny">Refresh</button>
+          </div>
+          <div id="taken-list" class="chips">Checking the server…</div>
+        </div>
+        <p class="hint">Accounts stay on the server. This browser remembers you after you log in.</p>
+      </div>
+    </section>
+
+    <!-- LOBBY -->
+    <section id="view-lobby" class="view">
+      <header class="topbar">
+        <div class="brand">✦ Stellar Party</div>
+        <div class="me-chip" id="me-chip"></div>
+        <button id="btn-admin" class="btn tiny ghost">Ranks</button>
+        <button id="btn-logout" class="btn tiny ghost">Log out</button>
+      </header>
+      <div class="lobby-grid">
+        <div class="panel play-panel">
+          <h2>Play</h2>
+          <p class="panel-lead">Create a private room or jump in with a code.</p>
+          <div class="btn-row">
+            <button id="btn-create" class="btn primary">Create Room</button>
+          </div>
+          <div class="join-row">
+            <input id="join-code" maxlength="6" placeholder="ROOM CODE" class="code-input" />
+            <button id="btn-join" class="btn">Join</button>
+          </div>
+          <div class="how">
+            <h3>How to play</h3>
+            <ul>
+              <li>Move with <kbd>W A S D</kbd> or arrow keys</li>
+              <li>Scoop glowing stars — gold ones are worth more</li>
+              <li>Highest score after 60 seconds wins</li>
+              <li>Invite friends from your Friends list</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel friends-panel">
+          <h2>Friends</h2>
+          <div class="search-row">
+            <input id="friend-search" placeholder="Find a player…" />
+            <button id="btn-search" class="btn tiny">Search</button>
+          </div>
+          <div id="search-results" class="list"></div>
+          <h3>Requests</h3>
+          <div id="requests-list" class="list empty-ok">No pending requests</div>
+          <h3>Your friends</h3>
+          <div id="friends-list" class="list empty-ok">Add friends to invite them</div>
+        </div>
+
+        <div class="panel chat-panel">
+          <h2>Lobby Chat</h2>
+          <div id="lobby-chat" class="chat-log"></div>
+          <form id="lobby-chat-form" class="chat-form">
+            <input id="lobby-chat-input" maxlength="160" placeholder="Say hi…" />
+            <button class="btn tiny">Send</button>
+          </form>
+          <h3>Online now</h3>
+          <div id="online-list" class="chips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROOM -->
+    <section id="view-room" class="view">
+      <header class="topbar">
+        <div class="brand">✦ Room <span id="room-code" class="code-badge"></span></div>
+        <div class="top-actions">
+          <button id="btn-copy" class="btn tiny">Copy code</button>
+          <button id="btn-leave" class="btn tiny ghost">Leave</button>
+        </div>
+      </header>
+      <div class="room-grid">
+        <div class="panel">
+          <h2>Players <span id="player-count" class="muted"></span></h2>
+          <div id="room-players" class="player-cards"></div>
+          <div class="btn-row">
+            <button id="btn-ready" class="btn">Ready</button>
+            <button id="btn-start" class="btn primary hidden">Start Match</button>
+          </div>
+          <p class="hint" id="host-hint"></p>
+        </div>
+        <div class="panel">
+          <h2>Room Chat</h2>
+          <div id="room-chat" class="chat-log"></div>
+          <form id="room-chat-form" class="chat-form">
+            <input id="room-chat-input" maxlength="160" placeholder="Team talk…" />
+            <button class="btn tiny">Send</button>
+          </form>
+          <h3>Invite a friend</h3>
+          <div id="invite-list" class="list empty-ok">Add friends first, then invite them here.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME -->
+    <section id="view-game" class="view">
+      <div class="hud">
+        <div class="hud-left">
+          <div class="timer" id="timer">60</div>
+          <div class="hud-label">seconds</div>
+        </div>
+        <div class="hud-scores" id="hud-scores"></div>
+      </div>
+      <canvas id="game"></canvas>
+      <div class="touch-pad" id="touch-pad">
+        <button data-dir="up">▲</button>
+        <div class="mid">
+          <button data-dir="left">◀</button>
+          <button data-dir="right">▶</button>
+        </div>
+        <button data-dir="down">▼</button>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="view-results" class="view">
+      <div class="hero-card results-card">
+        <h1>Match Over</h1>
+        <p class="tagline" id="winner-line"></p>
+        <ol id="leaderboard" class="leaderboard"></ol>
+        <div class="btn-row">
+          <button id="btn-again" class="btn primary">Back to Room</button>
+          <button id="btn-lobby" class="btn">Lobby</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <div id="invite-modal" class="modal hidden">
+    <div class="modal-card">
+      <h3>Room invite</h3>
+      <p id="invite-text"></p>
+      <div class="btn-row">
+        <button id="invite-accept" class="btn primary">Join</button>
+        <button id="invite-decline" class="btn ghost">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-modal" class="modal hidden">
+    <div class="modal-card admin-card">
+      <h3>Rank desk</h3>
+      <p class="hint">Ranks stay saved on the server.</p>
+      <form id="admin-lock">
+        <input id="admin-password" type="password" placeholder="Admin password" autocomplete="off" />
+        <button class="btn primary" type="submit">Open</button>
+      </form>
+      <div id="admin-panel" class="hidden">
+        <div class="join-row">
+          <input id="admin-user" placeholder="Username" />
+          <select id="admin-rank"></select>
+          <button id="admin-give" class="btn tiny" type="button">Save</button>
+        </div>
+        <div id="admin-list" class="list"></div>
+        <button id="admin-close" class="btn tiny ghost" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+  <script src="/js/game.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
